@@ -1,0 +1,67 @@
+name: Brilliance
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:    
+    runs-on: [self-hosted]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Build with dotnet
+      run: dotnet build BrillianceCodeAssessment\BrillianceCodeAssessment.csproj --configuration Release
+
+  test:
+    needs: build
+    runs-on: [self-hosted]
+
+    steps:
+    - name: Test
+      run: dotnet test BrillianceCodeAssessment.Tests
+
+  deploy:
+    needs: test
+    runs-on: [self-hosted]
+    
+    steps:
+    - name: Project publish
+      run: dotnet publish -c Release BrillianceCodeAssessment\BrillianceCodeAssessment.csproj -o ${{env.DOTNET_ROOT}}/Brilliance
+
+    - name: Deploy to IIS
+      run: |
+        if ((Get-WebSiteState -Name Brilliance).Value -eq "Started")
+        {
+            Stop-WebSite -Name Brilliance
+            echo "Stopped Website Brilliance"
+        }
+        if ((Get-WebAppPoolState -Name Brilliance).Value -eq "Started")
+        {
+            Stop-WebAppPool -Name Brilliance
+            echo "Stopped Application Pool Brilliance"
+        }
+        
+        Start-Sleep -s 15        
+        Copy-Item ${{env.DOTNET_ROOT}}/Brilliance/* C:\inetpub\wwwroot\Brilliance -Recurse -Force
+        
+        if ((Get-WebSiteState -Name Brilliance).Value -eq "Stopped")
+        {
+            Start-WebSite -Name Brilliance
+            echo "Started Website Brilliance"
+        }
+        if ((Get-WebAppPoolState -Name Brilliance).Value -eq "Stopped")
+        {
+            Start-WebAppPool -Name Brilliance
+            echo "Started Application Pool Brilliance"
+        }
+        
+        if ($lastexitcode -lt 8) { $global:lastexitcode = 0 }
