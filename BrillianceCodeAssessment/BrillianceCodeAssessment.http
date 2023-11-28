@@ -1,0 +1,6 @@
+@BrillianceCodeAssessment_HostAddress = http://localhost:5235
+
+GET {{BrillianceCodeAssessment_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
