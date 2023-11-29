@@ -1,13 +1,19 @@
-# Build
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /app
-COPY BrillianceCodeAssessment/. .
-RUN dotnet restore
-RUN dotnet publish -c Release -o out
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
 
-# Run
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /app
-COPY --from=build /app/out .
-ENV ASPNETCORE_URLS=http://*:80
-CMD dotnet App.dll
+# copy csproj and restore as distinct layers
+COPY BrillianceCodeAssessment/*.csproj .
+RUN dotnet restore
+
+# copy everything else and build app
+COPY BrillianceCodeAssessment/. .
+WORKDIR /source
+RUN dotnet publish -c release -o /BrillianceCodeAssessment --no-restore
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+EXPOSE 8080
+WORKDIR /BrillianceCodeAssessment
+COPY --from=build /BrillianceCodeAssessment .
+ENTRYPOINT ["dotnet", "BrillianceCodeAssessment.dll"]
