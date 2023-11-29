@@ -5,8 +5,6 @@ VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrillianceCodeAssessment", "BrillianceCodeAssessment.csproj", "{0C3BFDD8-8E98-4AE1-B6AC-85D543096D90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrillianceCodeAssessment.Tests", "..\BrillianceCodeAssessment.Tests\BrillianceCodeAssessment.Tests.csproj", "{DEE12349-CDB5-41D5-8257-0C76CC3CF045}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
